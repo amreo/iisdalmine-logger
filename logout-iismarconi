@@ -1,0 +1,2 @@
+#!/bin/bash
+curl --insecure --data Logout=Logout --data action=fw_logon --data fw_logon_type=logout https://10.1.254.254:4100/wgcgi.cgi
