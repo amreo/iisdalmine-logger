@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Login al firewall di iisdalmine
+Exec=iisdalmine-login
+Icon=user-login
+Terminal=true
+Type=Application
+StartupNotify=true
+Name[it_IT]=Login al firewall di iisdalmine
+GenericName[it_IT]=Login al firewall di iisdalmine
+Comment[it_IT]=Esegue il login al firewall del IIS G. Marconi di Dalmine

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Logout al firewall di iisdalmine
+Exec=iisdalmine-logout
+Icon=user-logout
+Terminal=true
+Type=Application
+StartupNotify=true
+Name[it_IT]=Logout al firewall di iisdalmine
+GenericName[it_IT]=Logout al firewall di iisdalmine
+Comment[it_IT]=Esegue il logout al firewall del IIS G. Marconi di Dalmine
