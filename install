@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# Installazione del programma curl
+if [ -x /usr/bin/curl ]; then # Verifica presenza programma 
+	true # Non fa nulla
+elif [ -x /usr/bin/apt-get ]; then # Per debian e derivate (più vecchie)
+	apt-get install curl 	
+elif [ -x /usr/bin/apt ]; then # Per debian o derivate
+	apt install curl 	
+elif [ -x /usr/bin/yum ]; then # RHEL o derivate
+	yum install curl 	
+elif [ -x /usr/bin/pacman]; then # Archlinux o derivate
+	pacman -S curl
+else
+	echo "Impossibile installare curl: package manager non riconosciuto"
+	exit 1
+fi
+
+# Copia degli script
+cp iisdalmine-* /usr/local/bin # Copia di tutti gli script (escluso install)
