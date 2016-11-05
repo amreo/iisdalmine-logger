@@ -1,0 +1,11 @@
+#/bin/sh
+
+# Installazione script
+./install
+
+# Copia degli desktop entry
+cp desktop-entry/* /usr/share/applications
+
+# Copia delle immagini di login e logout
+cp img/* /usr/share/icons
+
