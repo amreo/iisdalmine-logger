@@ -1,11 +1,10 @@
 #/bin/sh
 
-# Installazione script
-./install
+# Esecuzione script di installazione e resituzione 1 se lo script ha fallito
+./install || exit 1
 
 # Copia degli desktop entry
 cp desktop-entry/* /usr/share/applications
 
 # Copia delle immagini di login e logout
 cp img/* /usr/share/icons
-

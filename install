@@ -1,5 +1,10 @@
 #!/bin/sh
 
+if [ "$(id -u)" != "0" ]; then # Verifica diritti di root
+	echo "Non hai diritti di root users"
+	exit 1		
+fi
+
 # Installazione del programma curl
 if [ -x /usr/bin/curl ]; then # Verifica presenza programma 
 	true # Non fa nulla
