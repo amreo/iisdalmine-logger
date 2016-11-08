@@ -1,0 +1,41 @@
+#/bin/sh
+
+# legge l'username dal file ~/.iisdalmine/username.txt 
+if [ -f ~/.iisdalmine/username.txt ]; then
+	username=`cat ~/.iisdalmine/username.txt`
+else
+	username=""
+fi
+
+# legge la password dal file ~/.iisdalmine/password.txt 
+if [ -f ~/.iisdalmine/password.txt ]; then
+	password=`cat ~/.iisdalmine/password.txt`
+else
+	password=""
+fi
+
+# chiede l'username
+if [ ${#username} -ne 0 ]; then
+	read -p "username($username): " username_input
+else
+	read -p "username: " username_input
+fi 
+
+# chiede password
+if [ ${#password} -ne 0 ]; then
+	read -p "password($password): " password_input
+else
+	read -p "password: " password_input
+fi
+
+# scrive l'username nel file se è stata impostata(invio)
+if [ ${#username_input} -ne 0 ]; then
+	echo $username_input > ~/.iisdalmine/username.txt	
+fi
+
+# scrive la password nel file se non è stata impostata(invio)
+if [ ${#password_input} -ne 0 ]; then
+	echo $password_input > ~/.iisdalmine/password.txt	
+fi
+
+
