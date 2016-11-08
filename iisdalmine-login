@@ -1,2 +1,2 @@
 #/bin/sh
-curl --insecure --data fw_username=`cat ~/.iismarconi/username.txt` --data fw_password=`cat ~/.iismarconi/password.txt` --data fw_domain=marconi.locale --data submit=Login --data action=fw_logon --data fw_logon_type=logon --data redirect= --data lang=en-US https://172.22.20.254:4100/wgcgi.cgi
+curl --insecure --data fw_username=`cat ~/.iisdalmine/username.txt` --data fw_password=`cat ~/.iisdalmine/password.txt` --data fw_domain=marconi.locale --data submit=Login --data action=fw_logon --data fw_logon_type=logon --data redirect= --data lang=en-US https://172.22.20.254:4100/wgcgi.cgi
