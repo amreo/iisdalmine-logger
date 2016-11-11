@@ -28,6 +28,11 @@ else
 	read -p "password: " password_input
 fi
 
+# crea la directory .iisdalmine se non esiste
+if [ -d ~/.iisdalmine ]; then
+	mkdir ~/.iisdalmine
+fi
+
 # scrive l'username nel file se è stata impostata(invio)
 if [ ${#username_input} -ne 0 ]; then
 	echo $username_input > ~/.iisdalmine/username.txt	
