@@ -22,4 +22,6 @@ else
 fi
 
 # Copia degli script
+
 cp iisdalmine-* /usr/local/bin # Copia di tutti gli script (escluso install)
+chmod a+rx /usr/local/bin/iisdalmine-* # Fix permessi
