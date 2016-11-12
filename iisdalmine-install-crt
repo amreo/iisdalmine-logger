@@ -1,4 +1,4 @@
 #!/bin/sh
 # Scarica il certificato e lo installa in /usr/local/share/ca-certificates
 openssl s_client -connect 172.22.20.254:4100 < /dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /usr/local/share/ca-certificates/iisdalmine.crt
-update-ca-certificates
+update-ca-certificates > /dev/null
