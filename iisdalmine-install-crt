@@ -1,4 +1,18 @@
 #!/bin/sh
 # Scarica il certificato e lo installa in /usr/local/share/ca-certificates
-openssl s_client -connect 172.22.20.254:4100 < /dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /usr/local/share/ca-certificates/iisdalmine.crt
-update-ca-certificates > /dev/null
+openssl s_client -connect 172.22.20.254:4100 < /dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /tmp/iisdalmine.crt
+
+# Aggiorna i certificati
+if [ -x /usr/sbin/update-ca-certificates ]; then
+	cp /tmp/iisdalmine.crt /usr/local/share/ca-certificates/iisdalmine.crt
+	update-ca-certificates > /dev/null
+elif [ -x /usr/sbin/update-ca-trust ]; then
+	cp /tmp/iisdalmine.crt /etc/pki/ca-trust/source/anchors
+	update-ca-trust extract
+else
+	echo "Impossibile installare il certificato, metodo di gestione dei certificati sconosciuto e non implementato"
+	exit 1
+fi
+
+# Cancella il certificato temporaneo
+rm /tmp/iisdalmine.crt

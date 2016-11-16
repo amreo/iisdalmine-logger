@@ -9,11 +9,11 @@ fi
 if [ -x /usr/bin/curl ]; then # Verifica presenza programma 
 	true # Non fa nulla
 elif [ -x /usr/bin/apt-get ]; then # Per debian e derivate (più vecchie)
-	apt-get install curl 	
+	apt-get install curl ca-certificates
 elif [ -x /usr/bin/apt ]; then # Per debian o derivate
-	apt install curl 	
+	apt install curl ca-certificates 	
 elif [ -x /usr/bin/yum ]; then # RHEL o derivate
-	yum install curl 	
+	yum install curl ca-certificates 	
 elif [ -x /usr/bin/pacman]; then # Archlinux o derivate
 	pacman -S curl
 else
@@ -25,3 +25,8 @@ fi
 
 cp iisdalmine-* /usr/local/bin # Copia di tutti gli script (escluso install)
 chmod a+rx /usr/local/bin/iisdalmine-* # Fix permessi
+
+# Abilitazione la configurazione dinamica dei CA
+if [ -x update-ca-trust ]; then
+	update-ca-trust force-enable
+fi
