@@ -1,56 +1,165 @@
 #/bin/sh
 
-# legge l'username dal file ~/.iisdalmine/username.txt 
-if [ -f ~/.iisdalmine/username.txt ]; then
+# funzione help
+function help {
+	echo "iisdalmine-configure può essere richiamato con queste opzioni: "
+	echo " -u --username imposta l'username da argomenti. Richiede un valore 
+	 -s --password imposta la password da opzioni. Richiede un valore
+	 -i --firewall-ip imposta l'indirizzo ip del firewall da opzioni. Richiede un valore
+	 -p --firewall-port imposta la porta da opzioni. Richiede un valore
+	 -v --verbose mosta un log dettagliato di iisdalmine-configure
+	 -c --check fa il controllo sull'indirizzo ip e porta del firewall
+	 -h --help mostra l'help
+	 --show-password mostra la password sullo stdout "
+}
+
+# verifica se getopt è quello vecchio o nuovo
+getopt --test > /dev/null
+if [[ $? -ne 4 ]]; then 
+    echo "La versione di getopt è cosi vecchia. Aggiorna all!.`getopt --test`"
+    exit 1
+fi
+
+# -u --username imposta l'username da argomenti. Richiede un valore
+# -s --password imposta la password da opzioni. Richiede un valore
+# -i --firewall-ip imposta l'indirizzo ip del firewall da opzioni. Richiede un valore
+# -p --firewall-port imposta la porta da opzioni. Richiede un valore
+# -v --verbose mosta un log dettagliato di iisdalmine-configure
+# -c --check fa il controllo sull'indirizzo ip e porta del firewall
+# -h --help mostra l'help
+# --show-password mostra la password sullo stdout
+SHORT=u:s:i:p:vch
+LONG=username:,password:,firewall-ip:,firewall-port:,verbose,show-password,check,help
+show_password=s
+
+# Esegue lo parsing dello opzioni
+PARSED=`getopt --options $SHORT --longoptions $LONG --name "$0" -- "$@"`
+
+# Controlla l'uscita di getopt per errori
+if [ $? -ne 0 ]; then
+	echo "Errore nel parsing delle opzioni: $?"	
+	exit 1
+fi
+eval set -- "$PARSED"
+
+# Imposta le variabili interessate fino a -- 
+while true; do
+    case "$1" in
+        -u|--username)
+            username_option="$2"
+            shift 2
+            ;;
+        -s|--password)
+            password_option="$2"
+            shift 2
+            ;;
+        -i|--firewall-ip)
+            firewall_ip_option="$2"
+            shift 2
+            ;;
+        -p|--firewall-port)
+			firewall_port_option="$2"     
+			shift 2
+            ;;
+		-v|--verbose)
+			verbose=yes
+            shift 1
+            ;;
+		-c|--check)
+			check=yes
+            shift 1
+            ;;
+		--show-password)
+			show_password=
+            shift 1
+            ;;			 
+		-h|--help)
+			
+			exit 0
+			;;
+		--)
+            shift
+            break
+            ;;
+        *)
+            echo "Errore nelle opzioni"
+            exit 1
+            ;;
+    esac
+done
+
+
+# Imposta $username dalle opzioni o dal file ~/.iisdalmine/username.txt 
+if [ -n "$username_option" ]; then
+	username="$username_option"
+elif [ -f ~/.iisdalmine/username.txt ]; then
 	username=`cat ~/.iisdalmine/username.txt`
 else
 	username=""
 fi
 
-# legge la password dal file ~/.iisdalmine/password.txt 
-if [ -f ~/.iisdalmine/password.txt ]; then
+# Imposta $password dalle opzioni o dal file ~/.iisdalmine/password.txt 
+if [ -n "$password_option" ]; then
+	password="$password_option"
+elif [ -f ~/.iisdalmine/password.txt ]; then
 	password=`cat ~/.iisdalmine/password.txt`
 else
 	password=""
 fi
 
-# legge l'indirizzo ip del fw dal file ~/.iisdalmine/firewall-ip.txt 
-if [ -f ~/.iisdalmine/firewall-ip.txt ]; then
+# Imposta $firewall_ip dalle opzioni o dal file ~/.iisdalmine/firewall-ip.txt 
+if [ -n "$firewall_ip_option" ]; then
+	firewall_ip="$firewall_ip_option"
+elif [ -f ~/.iisdalmine/firewall-ip.txt ]; then
 	firewall_ip=`cat ~/.iisdalmine/firewall-ip.txt`
 else
 	firewall_ip="172.22.20.254"
 fi
 
-# legge la porta del webserver del fw dal file ~/.iisdalmine/firewall-port.txt 
-if [ -f ~/.iisdalmine/firewall-port.txt ]; then
+# Imposta $firewall_port dalle opzioni o dal file ~/.iisdalmine/firewall-port.txt 
+if [ -n "$firewall_port_option" ]; then
+	firewall_port="$firewall_port_option"
+elif [ -f ~/.iisdalmine/firewall-port.txt ]; then
 	firewall_port=`cat ~/.iisdalmine/firewall-port.txt`
 else
 	firewall_port="4100"
 fi
 
 # chiede l'username
-if [ ${#username} -ne 0 ]; then
+if [ -n "$username_option" ]; then
+	
+elif [ ${#username} -ne 0 ]; then
 	read -p "username($username): " username_input
 else
 	read -p "username: " username_input
 fi 
 
 # chiede password
-if [ ${#password} -ne 0 ]; then
-	read -sp "password(****): " password_input
+if [ -n "$password_option" ]; then
+	
+elif [ ${#password} -ne 0 ]; then
+	if [ -n "$show_password" ]; then
+		read -p "password($password): " password_input		
+	else
+		read -sp "password(****): " password_input
+	fi
 else
-	read -sp "password: " password_input
+	read -$show_passwordp "password: " password_input
 fi
 
 # chiede l'indirizzo ip del fw
-if [ ${#firewall_ip} -ne 0 ]; then
+if [ -n "$firewall_ip_option" ]; then
+	
+elif [ ${#firewall_ip} -ne 0 ]; then
 	read -p "firewall-ip($firewall_ip): " firewall_ip_input
 else
 	read -p "firewall-ip: " firewall_ip_input
 fi
 
 # chiede la porta del webserver del fw
-if [ ${#firewall_port} -ne 0 ]; then
+if [ -n "$firewall_port_option" ]; then
+	
+elif [ ${#firewall_port} -ne 0 ]; then
 	read -p "firewall-port($firewall_port): " firewall_port_input
 else
 	read -p "firewall-port: " firewall_port_input
@@ -61,17 +170,30 @@ if ! [ -d ~/.iisdalmine ]; then
 	mkdir ~/.iisdalmine
 fi
 
-# scrive l'username nel file se è stata impostata(invio)
-if [ ${#username_input} -ne 0 ]; then
+# scrive l'username nel file se è stata impostata da opzioni o input
+if [ -n "$username_option" ]; then
+	echo $username_option > ~/.iisdalmine/username.txt	
+elif [ -n "$username_input" ]; then
 	echo $username_input > ~/.iisdalmine/username.txt	
 fi
 
-# scrive l'indirizzo ip del fw nel file se non è stata impostata(invio)
-if [ ${#firewall_ip_input} -ne 0 ]; then
+# scrive la pasword nel file se è stata impostata da opzioni o input
+if [ -n "$password_option" ]; then
+	echo $password_option > ~/.iisdalmine/password.txt	
+elif [ -n "$password_input" ]; then
+	echo $password_input > ~/.iisdalmine/password.txt	
+fi
+
+# scrive l'ip del fw nel file se è stata impostata da opzioni o input
+if [ -n "firewall_ip_option" ]; then
+	echo $firewall_ip_option > ~/.iisdalmine/firewall-ip.txt	
+elif [ -n "$firewall_ip_input" ]; then
 	echo $firewall_ip_input > ~/.iisdalmine/firewall-ip.txt	
 fi
 
-# scrive la porta del webserver del firewall nel file se non è stata impostata(invio)
-if [ ${#firewall_port_input} -ne 0 ]; then
-	echo $firewall_port_input > ~/.iisdalmine/firewall-port.txt	
+# scrive la porta del webserver del fw nel file se è stata impostata da opzioni o input
+if [ -n "firewall_port_option" ]; then
+	echo $firewall_port_option > ~/.iisdalmine/firewall_port.txt	
+elif [ -n "$firewall_port_input" ]; then
+	echo $firewall_port_input > ~/.iisdalmine/firewall_port.txt	
 fi
