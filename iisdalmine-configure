@@ -14,6 +14,20 @@ else
 	password=""
 fi
 
+# legge l'indirizzo ip del fw dal file ~/.iisdalmine/firewall-ip.txt 
+if [ -f ~/.iisdalmine/firewall-ip.txt ]; then
+	firewall_ip=`cat ~/.iisdalmine/firewall-ip.txt`
+else
+	firewall_ip="172.22.20.254"
+fi
+
+# legge la porta del webserver del fw dal file ~/.iisdalmine/firewall-port.txt 
+if [ -f ~/.iisdalmine/firewall-port.txt ]; then
+	firewall_port=`cat ~/.iisdalmine/firewall-port.txt`
+else
+	firewall_port="4100"
+fi
+
 # chiede l'username
 if [ ${#username} -ne 0 ]; then
 	read -p "username($username): " username_input
@@ -28,6 +42,20 @@ else
 	read -p "password: " password_input
 fi
 
+# chiede l'indirizzo ip del fw
+if [ ${#firewall_ip} -ne 0 ]; then
+	read -p "firewall-ip($firewall_ip): " firewall_ip_input
+else
+	read -p "firewall-ip: " firewall_ip_input
+fi
+
+# chiede la porta del webserver del fw
+if [ ${#firewall_port} -ne 0 ]; then
+	read -p "firewall-port($firewall_port): " firewall_port_input
+else
+	read -p "firewall-port: " firewall_port_input
+fi
+
 # crea la directory .iisdalmine se non esiste
 if ! [ -d ~/.iisdalmine ]; then
 	mkdir ~/.iisdalmine
@@ -38,9 +66,12 @@ if [ ${#username_input} -ne 0 ]; then
 	echo $username_input > ~/.iisdalmine/username.txt	
 fi
 
-# scrive la password nel file se non è stata impostata(invio)
-if [ ${#password_input} -ne 0 ]; then
-	echo $password_input > ~/.iisdalmine/password.txt	
+# scrive l'indirizzo ip del fw nel file se non è stata impostata(invio)
+if [ ${#firewall_ip_input} -ne 0 ]; then
+	echo $firewall_ip_input > ~/.iisdalmine/firewall-ip.txt	
 fi
 
-
+# scrive la porta del webserver del firewall nel file se non è stata impostata(invio)
+if [ ${#firewall_port_input} -ne 0 ]; then
+	echo $firewall_port_input > ~/.iisdalmine/firewall-port.txt	
+fi

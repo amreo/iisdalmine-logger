@@ -1,6 +1,6 @@
 #!/bin/sh
 # Scarica il certificato e lo installa in /usr/local/share/ca-certificates
-openssl s_client -connect 172.22.20.254:4100 < /dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /tmp/iisdalmine.crt
+openssl s_client -connect `cat ~/.iisdalmine/firewall-ip.txt`:`cat ~/.iisdalmine/firewall-port.txt` < /dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /tmp/iisdalmine.crt
 
 # Aggiorna i certificati
 if [ -x /usr/sbin/update-ca-certificates ]; then

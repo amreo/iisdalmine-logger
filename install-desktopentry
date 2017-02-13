@@ -8,6 +8,5 @@ cp desktop-entry/* /usr/share/applications
 # Imposta i permessi corretti
 chmod a+rx /usr/share/applications/iismarconi-*.desktop
 
-
 # Copia delle immagini di login e logout
 cp img/* /usr/share/icons
