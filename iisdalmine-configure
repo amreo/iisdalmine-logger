@@ -37,9 +37,9 @@ fi
 
 # chiede password
 if [ ${#password} -ne 0 ]; then
-	read -p "password($password): " password_input
+	read -sp "password(****): " password_input
 else
-	read -p "password: " password_input
+	read -sp "password: " password_input
 fi
 
 # chiede l'indirizzo ip del fw
