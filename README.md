@@ -1,24 +1,24 @@
 # Come installare
-	1) installare git
-	Su distribuzioni Debian o derivate eseguire
-	```sh
-	apt install git
-	```
-		b) Su distribuzioni RHEL o derivate eseguire
+	1. installare git
+		* Su distribuzioni Debian o derivate eseguire
+		```sh
+		apt install git
+		```
+		* Su distribuzioni RHEL o derivate eseguire
 			```
 			yum install git
 			```		
-		c) Su distribuzioni Archlinux o derivate eseguire
+		* Su distribuzioni Archlinux o derivate eseguire
 			```
 			pacman -S git
 			```
-		d) Su altre distribuzioni consultare la propria documentazione di riferimento 
+		* Su altre distribuzioni consultare la propria documentazione di riferimento 
 			o cercare su google come installare git su quella distribuzione
-	2) Clonare il repository iisdalmine-logger
+	2. Clonare il repository iisdalmine-logger
 			```
 			git clone https://github.com/amreo/iisdalmine-logger.git
 			```
-	3) Installare gli script
+	3. Installare gli script
 		```
 		cd iisdalmine-logger
 		```
@@ -30,16 +30,16 @@
 			```
 			./install
 			```
-	4) Configurare gli script
+	4. Configurare gli script
 		```
 		iisdalmine-configure
 		```
 # Come eseguire
-	*) per fare il login eseguire 
+	* per fare il login eseguire 
 		```
 		iisdalmine-login
 		```		
-	*) per fare il logout eseguire
+	* per fare il logout eseguire
 		```
 		iisdalmine-login
 		```		
