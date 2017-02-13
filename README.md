@@ -1,7 +1,7 @@
 # Come installare
 	1) installare git
 		a) Su distribuzioni Debian o derivate eseguire
-			```bash
+			```sh
 			apt install git
 			```
 		b) Su distribuzioni RHEL o derivate eseguire
