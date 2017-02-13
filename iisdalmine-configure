@@ -74,7 +74,7 @@ while true; do
             shift 1
             ;;			 
 		-h|--help)
-			
+			help
 			exit 0
 			;;
 		--)
@@ -88,10 +88,18 @@ while true; do
     esac
 done
 
+if [ -n "$verbose" ]; then
+	echo "\$username_option=$username_option"
+	echo "\$password_option=$password_option"
+	echo "\$firewall_ip_option=$firewall_ip_option"
+	echo "\$firewall_port_option=$firewall_port_option"
+	echo "\$show_password=$show_password"
+	echo "\$check=$check"
+fi
 
 # Imposta $username dalle opzioni o dal file ~/.iisdalmine/username.txt 
 if [ -n "$username_option" ]; then
-	username="$username_option"
+
 elif [ -f ~/.iisdalmine/username.txt ]; then
 	username=`cat ~/.iisdalmine/username.txt`
 else
@@ -100,7 +108,7 @@ fi
 
 # Imposta $password dalle opzioni o dal file ~/.iisdalmine/password.txt 
 if [ -n "$password_option" ]; then
-	password="$password_option"
+
 elif [ -f ~/.iisdalmine/password.txt ]; then
 	password=`cat ~/.iisdalmine/password.txt`
 else
@@ -109,7 +117,7 @@ fi
 
 # Imposta $firewall_ip dalle opzioni o dal file ~/.iisdalmine/firewall-ip.txt 
 if [ -n "$firewall_ip_option" ]; then
-	firewall_ip="$firewall_ip_option"
+
 elif [ -f ~/.iisdalmine/firewall-ip.txt ]; then
 	firewall_ip=`cat ~/.iisdalmine/firewall-ip.txt`
 else
@@ -118,11 +126,18 @@ fi
 
 # Imposta $firewall_port dalle opzioni o dal file ~/.iisdalmine/firewall-port.txt 
 if [ -n "$firewall_port_option" ]; then
-	firewall_port="$firewall_port_option"
+
 elif [ -f ~/.iisdalmine/firewall-port.txt ]; then
 	firewall_port=`cat ~/.iisdalmine/firewall-port.txt`
 else
 	firewall_port="4100"
+fi
+
+if [ -n "$verbose" ]; then
+	echo "\$username=$username"
+	echo "\$password=$password"
+	echo "\$firewall_ip=$firewall_ip"
+	echo "\$firewall_port=$firewall_port"
 fi
 
 # chiede l'username
@@ -165,35 +180,69 @@ else
 	read -p "firewall-port: " firewall_port_input
 fi
 
+if [ -n "$verbose" ]; then
+	echo "\$username_input=$username_input"
+	echo "\$password_input=$password_input"
+	echo "\$firewall_ip_input=$firewall_ip_input"
+	echo "\$firewall_port_input=$firewall_port_input"
+fi
+
 # crea la directory .iisdalmine se non esiste
 if ! [ -d ~/.iisdalmine ]; then
 	mkdir ~/.iisdalmine
+	if [ -n "$verbose" ]; then
+		echo "Creata dir ~/.iisdalmine"
+	fi
 fi
 
 # scrive l'username nel file se è stata impostata da opzioni o input
 if [ -n "$username_option" ]; then
 	echo $username_option > ~/.iisdalmine/username.txt	
+	if [ -n "$verbose" ]; then
+		echo "Scritto \$username_option in ~/.iisdalmine/username.txt"
+	fi
 elif [ -n "$username_input" ]; then
 	echo $username_input > ~/.iisdalmine/username.txt	
+	if [ -n "$verbose" ]; then
+		echo "Scritto \$username_input in ~/.iisdalmine/username.txt"
+	fi
 fi
 
 # scrive la pasword nel file se è stata impostata da opzioni o input
 if [ -n "$password_option" ]; then
 	echo $password_option > ~/.iisdalmine/password.txt	
+	if [ -n "$verbose" ]; then
+		echo "Scritto \$password_option in ~/.iisdalmine/password.txt"
+	fi
 elif [ -n "$password_input" ]; then
 	echo $password_input > ~/.iisdalmine/password.txt	
+	if [ -n "$verbose" ]; then
+		echo "Scritto \$password_input in ~/.iisdalmine/password.txt"
+	fi
 fi
 
 # scrive l'ip del fw nel file se è stata impostata da opzioni o input
 if [ -n "firewall_ip_option" ]; then
 	echo $firewall_ip_option > ~/.iisdalmine/firewall-ip.txt	
+	if [ -n "$verbose" ]; then
+		echo "Scritto \$firewall_ip_option in ~/.iisdalmine/firewall-ip.txt"
+	fi
 elif [ -n "$firewall_ip_input" ]; then
 	echo $firewall_ip_input > ~/.iisdalmine/firewall-ip.txt	
+	if [ -n "$verbose" ]; then
+		echo "Scritto \$firewall_ip_input in ~/.iisdalmine/firewall-ip.txt"
+	fi
 fi
 
 # scrive la porta del webserver del fw nel file se è stata impostata da opzioni o input
 if [ -n "firewall_port_option" ]; then
 	echo $firewall_port_option > ~/.iisdalmine/firewall_port.txt	
+	if [ -n "$verbose" ]; then
+		echo "Scritto \$firewall_port_option in ~/.iisdalmine/firewall-port.txt"
+	fi
 elif [ -n "$firewall_port_input" ]; then
 	echo $firewall_port_input > ~/.iisdalmine/firewall_port.txt	
+	if [ -n "$verbose" ]; then
+		echo "Scritto \$firewall_port_input in ~/.iisdalmine/firewall-port.txt"
+	fi
 fi
