@@ -16,7 +16,7 @@ function help {
 # verifica se getopt è quello vecchio o nuovo
 getopt --test > /dev/null
 if [[ $? -ne 4 ]]; then 
-    echo "La versione di getopt è cosi vecchia. Aggiorna all!.`getopt --test`"
+    echo "La versione di getopt è cosi vecchia. Aggiorna tutto!.`getopt --test`"
     exit 1
 fi
 
@@ -46,19 +46,19 @@ eval set -- "$PARSED"
 while true; do
     case "$1" in
         -u|--username)
-            username_option="$2"
+            username="$2"
             shift 2
             ;;
         -s|--password)
-            password_option="$2"
+            password="$2"
             shift 2
             ;;
         -i|--firewall-ip)
-            firewall_ip_option="$2"
+            firewall_ip="$2"
             shift 2
             ;;
         -p|--firewall-port)
-			firewall_port_option="$2"     
+			firewall_port="$2"     
 			shift 2
             ;;
 		-v|--verbose)
@@ -89,48 +89,44 @@ while true; do
 done
 
 if [ -n "$verbose" ]; then
-	echo "\$username_option=$username_option"
-	echo "\$password_option=$password_option"
-	echo "\$firewall_ip_option=$firewall_ip_option"
-	echo "\$firewall_port_option=$firewall_port_option"
+	echo "\$username=$username"
+	echo "\$password=$password"
+	echo "\$firewall_ip=$firewall_ip"
+	echo "\$firewall_port=$firewall_port"
 	echo "\$show_password=$show_password"
 	echo "\$check=$check"
 fi
 
 # Imposta $username dalle opzioni o dal file ~/.iisdalmine/username.txt 
-if [ -n "$username_option" ]; then
-	username=""
-elif [ -f ~/.iisdalmine/username.txt ]; then
+if [ -n "$username" ]; then # username definito prima (da opzioni)
+	sleep 0
+elif [ -f ~/.iisdalmine/username.txt ]; then # username non definito, carica l'username da file, solo per mostrarlo all'input
 	username=`cat ~/.iisdalmine/username.txt`
-else
-	username=""
+	ask_username="true"
 fi
 
 # Imposta $password dalle opzioni o dal file ~/.iisdalmine/password.txt 
-if [ -n "$password_option" ]; then
-	password=""
-elif [ -f ~/.iisdalmine/password.txt ]; then
+if [ -n "$password" ]; then # password definito prima (da opzioni)
+	sleep 0
+elif [ -f ~/.iisdalmine/password.txt ]; then # password non definito, carica password da file, solo per mostrarlo all'input
 	password=`cat ~/.iisdalmine/password.txt`
-else
-	password=""
+	ask_password="true"
 fi
 
 # Imposta $firewall_ip dalle opzioni o dal file ~/.iisdalmine/firewall-ip.txt 
-if [ -n "$firewall_ip_option" ]; then
-	firewall_ip="172.22.20.254"
-elif [ -f ~/.iisdalmine/firewall-ip.txt ]; then
+if [ -n "$firewall_ip" ]; then # firewall_ip definito prima (da opzioni)
+	sleep 0
+elif [ -f ~/.iisdalmine/firewall-ip.txt ]; then # firewall-ip non definito, carica firewall-ip da file, solo per mostrarlo all'input
 	firewall_ip=`cat ~/.iisdalmine/firewall-ip.txt`
-else
-	firewall_ip="172.22.20.254"
+	firewall_ip="true"
 fi
 
 # Imposta $firewall_port dalle opzioni o dal file ~/.iisdalmine/firewall-port.txt 
-if [ -n "$firewall_port_option" ]; then
-	firewall_port="4100"
-elif [ -f ~/.iisdalmine/firewall-port.txt ]; then
+if [ -n "$firewall_port" ]; then # firewall_port definito prima (da opzioni)
+	sleep 0
+elif [ -f ~/.iisdalmine/firewall-port.txt ]; then # firewall-port non definito, carica firewall-port da file, solo per mostrarlo all'input
 	firewall_port=`cat ~/.iisdalmine/firewall-port.txt`
-else
-	firewall_port="4100"
+	firewall_port="true"
 fi
 
 if [ -n "$verbose" ]; then
@@ -142,8 +138,6 @@ fi
 
 # chiede l'username
 if [ -n "$username_option" ]; then
-	sleep 0
-elif [ ${#username} -ne 0 ]; then
 	read -p "username($username): " username_input
 else
 	read -p "username: " username_input
