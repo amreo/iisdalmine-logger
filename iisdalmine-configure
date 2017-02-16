@@ -3,7 +3,7 @@
 # funzione help
 function help {
 	echo "iisdalmine-configure può essere richiamato con queste opzioni: "
-	echo " -u --username imposta l'username da argomenti. Richiede un valore 
+	echo "         -u --username imposta l'username da argomenti. Richiede un valore 
 	 -s --password imposta la password da opzioni. Richiede un valore
 	 -i --firewall-ip imposta l'indirizzo ip del firewall da opzioni. Richiede un valore
 	 -p --firewall-port imposta la porta da opzioni. Richiede un valore
@@ -97,36 +97,54 @@ if [ -n "$verbose" ]; then
 	echo "\$check=$check"
 fi
 
+# crea la directory .iisdalmine se non esiste
+if ! [ -d ~/.iisdalmine ]; then
+	mkdir ~/.iisdalmine
+	if [ -n "$verbose" ]; then
+		echo "Creata dir ~/.iisdalmine"
+	fi
+fi
+
 # Imposta $username dalle opzioni o dal file ~/.iisdalmine/username.txt 
 if [ -n "$username" ]; then # username definito prima (da opzioni)
 	sleep 0
-elif [ -f ~/.iisdalmine/username.txt ]; then # username non definito, carica l'username da file, solo per mostrarlo all'input
+elif [ -e ~/.iisdalmine/username.txt ]; then # username non definito, carica l'username da file, solo per mostrarlo all'input
 	username=`cat ~/.iisdalmine/username.txt`
+	ask_username="true"
+else
 	ask_username="true"
 fi
 
 # Imposta $password dalle opzioni o dal file ~/.iisdalmine/password.txt 
 if [ -n "$password" ]; then # password definito prima (da opzioni)
 	sleep 0
-elif [ -f ~/.iisdalmine/password.txt ]; then # password non definito, carica password da file, solo per mostrarlo all'input
+elif [ -e ~/.iisdalmine/password.txt ]; then # password non definito, carica password da file, solo per mostrarlo all'input
 	password=`cat ~/.iisdalmine/password.txt`
+	ask_password="true"
+else
 	ask_password="true"
 fi
 
 # Imposta $firewall_ip dalle opzioni o dal file ~/.iisdalmine/firewall-ip.txt 
 if [ -n "$firewall_ip" ]; then # firewall_ip definito prima (da opzioni)
 	sleep 0
-elif [ -f ~/.iisdalmine/firewall-ip.txt ]; then # firewall-ip non definito, carica firewall-ip da file, solo per mostrarlo all'input
+elif [ -e ~/.iisdalmine/firewall-ip.txt ]; then # firewall-ip non definito, carica firewall-ip da file, solo per mostrarlo all'input
 	firewall_ip=`cat ~/.iisdalmine/firewall-ip.txt`
-	firewall_ip="true"
+	ask_firewall_ip="true"
+else
+	firewall_ip="172.22.20.254"
+	ask_firewall_ip="true"
 fi
 
 # Imposta $firewall_port dalle opzioni o dal file ~/.iisdalmine/firewall-port.txt 
 if [ -n "$firewall_port" ]; then # firewall_port definito prima (da opzioni)
 	sleep 0
-elif [ -f ~/.iisdalmine/firewall-port.txt ]; then # firewall-port non definito, carica firewall-port da file, solo per mostrarlo all'input
+elif [ -e ~/.iisdalmine/firewall-port.txt ]; then # firewall-port non definito, carica firewall-port da file, solo per mostrarlo all'input
 	firewall_port=`cat ~/.iisdalmine/firewall-port.txt`
-	firewall_port="true"
+	ask_firewall_port="true"
+else
+	firewall_port=4100
+	ask_firewall_port="true"
 fi
 
 if [ -n "$verbose" ]; then
@@ -137,128 +155,82 @@ if [ -n "$verbose" ]; then
 fi
 
 # chiede l'username
-if [ -n "$username_option" ]; then
-	read -p "username($username): " username_input
-else
-	read -p "username: " username_input
-fi 
-
+if [ -n "$ask_username" ]; then
+	read -p "username($username): " username
+fi
 # chiede password
-if [ -n "$password_option" ]; then
-	sleep 0
-elif [ ${#password} -ne 0 ]; then
+if [ -n "$ask_password" ]; then
 	if [ -n "$show_password" ]; then
-		read -sp "password(****): " password_input
+		read -sp "password(****): " password
 		echo # Va a capo
 	else
-		read -p "password($password): " password_input
+		read -p "password($password): " password
 	fi
-else
-	read -${show_password}p "password: " password_input
-	echo # Va a capo
 fi
-
-# chiede l'indirizzo ip del fw
-if [ -n "$firewall_ip_option" ]; then
-	sleep 0
-elif [ ${#firewall_ip} -ne 0 ]; then
-	read -p "firewall-ip($firewall_ip): " firewall_ip_input
-else
-	read -p "firewall-ip: " firewall_ip_input
+# chiede firewall-ip
+if [ -n "$ask_firewall_ip" ]; then
+	read -p "firewall-ip($firewall_ip): " firewall_ip
 fi
-
-# chiede la porta del webserver del fw
-if [ -n "$firewall_port_option" ]; then
-	sleep 0
-elif [ ${#firewall_port} -ne 0 ]; then
-	read -p "firewall-port($firewall_port): " firewall_port_input
-else
-	read -p "firewall-port: " firewall_port_input
+# chiede firewall-port
+if [ -n "$ask_firewall_port" ]; then
+	read -p "firewall-port($firewall_port): " firewall_port
 fi
 
 if [ -n "$verbose" ]; then
-	echo "\$username_input=$username_input"
-	echo "\$password_input=$password_input"
-	echo "\$firewall_ip_input=$firewall_ip_input"
-	echo "\$firewall_port_input=$firewall_port_input"
-fi
-
-# crea la directory .iisdalmine se non esiste
-if ! [ -d ~/.iisdalmine ]; then
-	mkdir ~/.iisdalmine
-	if [ -n "$verbose" ]; then
-		echo "Creata dir ~/.iisdalmine"
-	fi
+	echo "\$username=$username"
+	echo "\$password=$password"
+	echo "\$firewall_ip=$firewall_ip"
+	echo "\$firewall_port=$firewall_port"
 fi
 
 # scrive l'username nel file se è stata impostata da opzioni o input
-if [ -n "$username_option" ]; then
-	echo $username_option > ~/.iisdalmine/username.txt	
+if [ -n "$username" ]; then
+	echo "$username" > ~/.iisdalmine/username.txt
 	if [ -n "$verbose" ]; then
-		echo "Scritto \$username_option in ~/.iisdalmine/username.txt"
-	fi
-elif [ -n "$username_input" ]; then
-	echo $username_input > ~/.iisdalmine/username.txt	
-	if [ -n "$verbose" ]; then
-		echo "Scritto \$username_input in ~/.iisdalmine/username.txt"
-	fi
-elif ! [ -f ~/.iisdalmine/username.txt ]; then
+		echo "scritto username in ~/.iisdalmine/username.txt"
+	fi 
+elif ! [ -e ~/.iisdalmine/username.txt ]; then
 	touch ~/.iisdalmine/username.txt
 	if [ -n "$verbose" ]; then
-		echo "Creato ~/.iisdalmine/username.txt"
-	fi
+		echo "creato ~/.iisdalmine/username.txt perchè non esiste"
+	fi 	
 fi
 
-# scrive la pasword nel file se è stata impostata da opzioni o input
-if [ -n "$password_option" ]; then
-	echo $password_option > ~/.iisdalmine/password.txt	
+# scrive la password nel file se è stata impostata da opzioni o input
+if [ -n "$password" ]; then
+	echo "$password" > ~/.iisdalmine/password.txt
 	if [ -n "$verbose" ]; then
-		echo "Scritto \$password_option in ~/.iisdalmine/password.txt"
-	fi
-elif [ -n "$password_input" ]; then
-	echo $password_input > ~/.iisdalmine/password.txt	
-	if [ -n "$verbose" ]; then
-		echo "Scritto \$password_input in ~/.iisdalmine/password.txt"
-	fi
-elif ! [ -f ~/.iisdalmine/password.txt ]; then
+		echo "scritto password in ~/.iisdalmine/password.txt"
+	fi 
+elif ! [ -e ~/.iisdalmine/password.txt ]; then
 	touch ~/.iisdalmine/password.txt
 	if [ -n "$verbose" ]; then
-		echo "Creato ~/.iisdalmine/password.txt"
-	fi
+		echo "creato ~/.iisdalmine/password.txt perchè non esiste"
+	fi 	
 fi
 
-# scrive l'ip del fw nel file se è stata impostata da opzioni o input
-if [ -n "$firewall_ip_option" ]; then
-	echo $firewall_ip_option > ~/.iisdalmine/firewall-ip.txt	
+# scrive l'firewall-ip nel file se è stata impostata da opzioni o input
+if [ -n "$firewall_ip" ]; then
+	echo "$firewall_ip" > ~/.iisdalmine/firewall-ip.txt
 	if [ -n "$verbose" ]; then
-		echo "Scritto \$firewall_ip_option in ~/.iisdalmine/firewall-ip.txt"
-	fi
-elif [ -n "$firewall_ip_input" ]; then
-	echo $firewall_ip_input > ~/.iisdalmine/firewall-ip.txt	
-	if [ -n "$verbose" ]; then
-		echo "Scritto \$firewall_ip_input in ~/.iisdalmine/firewall-ip.txt"
-	fi
-elif ! [ -f ~/.iisdalmine/firewall-ip.txt ]; then
+		echo "scritto firewall_ip in ~/.iisdalmine/firewall-ip.txt"
+	fi 
+elif ! [ -e ~/.iisdalmine/firewall-ip.txt ]; then
 	echo "172.22.20.254" > ~/.iisdalmine/firewall-ip.txt
 	if [ -n "$verbose" ]; then
-		echo "Creato ~/.iisdalmine/firewall-ip.txt con 172.22.20.254"
-	fi
+		echo "creato ~/.iisdalmine/firewall-ip.txt perchè non esiste"
+	fi 	
 fi
 
-# scrive la porta del webserver del fw nel file se è stata impostata da opzioni o input
-if [ -n "$firewall_port_option" ]; then
-	echo $firewall_port_option > ~/.iisdalmine/firewall-port.txt	
+# scrive l'firewall-port nel file se è stata impostata da opzioni o input
+if [ -n "$firewall_port" ]; then
+	echo "$firewall_port" > ~/.iisdalmine/firewall-port.txt
 	if [ -n "$verbose" ]; then
-		echo "Scritto \$firewall_port_option in ~/.iisdalmine/firewall-port.txt"
-	fi
-elif [ -n "$firewall_port_input" ]; then
-	echo $firewall_port_input > ~/.iisdalmine/firewall-port.txt	
-	if [ -n "$verbose" ]; then
-		echo "Scritto \$firewall_port_input in ~/.iisdalmine/firewall-port.txt"
-	fi
-elif ! [ -f ~/.iisdalmine/firewall-port.txt ]; then
+		echo "scritto firewall_port in ~/.iisdalmine/firewall-port.txt"
+	fi 
+elif ! [ -e ~/.iisdalmine/firewall-port.txt ]; then
 	echo "4100" > ~/.iisdalmine/firewall-port.txt
 	if [ -n "$verbose" ]; then
-		echo "Creato ~/.iisdalmine/firewall-port.txt con 4100"
-	fi
+		echo "creato ~/.iisdalmine/firewall-port.txt perchè non esiste"
+	fi 	
 fi
