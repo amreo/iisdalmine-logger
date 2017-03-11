@@ -13,10 +13,11 @@ function help {
 	 --show-password mostra la password sullo stdout "
 }
 
+
 # verifica se getopt è quello vecchio o nuovo
 getopt --test > /dev/null
 if [[ $? -ne 4 ]]; then 
-    echo "La versione di getopt è cosi vecchia. Aggiorna tutto!.`getopt --test`"
+    echo "La versione di getopt è vecchissima, ti consiglio di aggiornare tutto!.`getopt --test`"
     exit 1
 fi
 
