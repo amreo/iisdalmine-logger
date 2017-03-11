@@ -235,3 +235,12 @@ elif ! [ -e ~/.iisdalmine/firewall-port.txt ]; then
 		echo "creato ~/.iisdalmine/firewall-port.txt perchè non esiste"
 	fi 	
 fi
+
+# esegue il controllo
+if [ -n "$check" ]; then
+	if [ -n "$verbose" ]; then
+		iisdalmine-check --verbose
+	else
+		iisdalmine-check
+	fi
+fi
