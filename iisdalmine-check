@@ -5,3 +5,164 @@
 #	Prova download pagine login fw
 # 	Login
 #	Controllo login (controllo redirect)
+
+# funzione help
+function help {
+	echo "iisdalmine-check può essere richiamato con queste opzioni: "
+	echo "         -u --username imposta l'username da argomenti. Richiede un valore 
+	 -s --password imposta la password da opzioni. Richiede un valore
+	 -i --firewall-ip imposta l'indirizzo ip del firewall da opzioni. Richiede un valore
+	 -p --firewall-port imposta la porta da opzioni. Richiede un valore
+	 -v --verbose mosta un log dettagliato di iisdalmine-configure
+	 -h --help mostra l'help
+	 --no-ping disabilita il controllo del ping
+	 -c --ping-count importa il numero di pacchetti ICMP da spedire. Richiede un valore
+	 -d --no-download disabilita il controllo del download della pagine del fw
+	 -l --login esegue il login
+	 --no-login-check disabilita il controllo del login"
+}
+
+# verifica se getopt è quello vecchio o nuovo
+getopt --test > /dev/null
+if [[ $? -ne 4 ]]; then 
+    echo "La versione di getopt è vecchissima, ti consiglio di aggiornare tutto!.`getopt --test`"
+    exit 1
+fi
+
+SHORT=u:s:i:p:c:vhld
+LONG=username:,password:,firewall-ip:,firewall-port:,verbose,help,no-ping,ping-count:,no-download,login,no-login-check 
+
+username=`cat ~/.iisdalmine/username.txt`
+password=`cat ~/.iisdalmine/password.txt`
+firewall_ip=`cat ~/.iisdalmine/firewall-ip.txt`
+firewall_port=`cat ~/.iisdalmine/firewall-port.txt`
+ping_count=2
+
+# Esegue lo parsing dello opzioni
+PARSED=`getopt --options $SHORT --longoptions $LONG --name $0 -- $@`
+
+# Controlla l'uscita di getopt per errori
+if [ $? -ne 0 ]; then
+	echo "Errore nel parsing delle opzioni: $?"	
+	exit 1
+fi
+eval set -- "$PARSED"
+
+# Imposta le variabili interessate fino a -- 
+while true; do
+    case "$1" in
+        -u|--username)
+            username="$2"
+            shift 2
+            ;;
+        -s|--password)
+            password="$2"
+            shift 2
+            ;;
+        -i|--firewall-ip)
+            firewall_ip="$2"
+            shift 2
+            ;;
+        -p|--firewall-port)
+			firewall_port="$2"     
+			shift 2
+            ;;
+		-v|--verbose)
+			verbose=yes
+            shift 1
+            ;;			
+		--no-ping)
+			no_ping=yes
+			shift 1
+			;;
+		-c|--ping-count)
+			ping_count="$2"
+			shift 2
+			;;
+		-d|--no-download)
+			no_download=yes
+			shift 1
+			;;
+		-l|--login)
+			login=yes
+			shift 1
+			;;
+		--no-login-check)
+			no_login_check=yes
+			shift 1
+			;;
+		-h|--help)
+			help
+			exit 0
+			;;
+		--)
+            shift
+            break
+            ;;
+        *)
+            echo "Errore nelle opzioni"
+            exit 1
+            ;;
+    esac
+done
+
+if [ -n "$verbose" ]; then
+	echo "\$username=$username"
+	echo "\$password=$password"
+	echo "\$firewall_ip=$firewall_ip"
+	echo "\$firewall_port=$firewall_port"
+	echo "\$no_ping=$no_ping"
+	echo "\$ping_count=$ping_count"
+	echo "\$no_download=$no_download"
+	echo "\$login=$login"
+	echo "\$no_login_check=$no_login_check"
+fi
+
+# Controlla se no_ping non è definita, in tal caso esegue i controlli
+if [ -z no_ping ]; then
+	if [ -n "$verbose" ]; then
+		echo "esecuzione ping"
+	fi
+	if ! [ `ping -c $ping_count $firewall_ip` ] then
+		echo "ping fallito, sei collegato alla rete del iisdalmine?"
+		exit 1  
+	fi
+fi
+
+# Controlla se è possibile fare il download della pagina di login al fw
+if [ -z no_download ]; then
+	if [ -n "$verbose" ]; then
+		echo "scaricamento pagina"
+	fi
+	# TODO: implementare download pagina
+	echo "Check non definito"
+fi
+
+# Esegue il login se definito
+if [ -n login]; then
+	if [ -n "$verbose" ]; then
+		echo "Esecuzione login"
+	fi
+	# esecuzione login
+	if [ -n "$verbose" ]; then
+		iisdalmine-login -u $username -s $password -i $firewall_ip -p $firewall_port -v
+	else
+		iisdalmine-login -u $username -s $password -i $firewall_ip -p $firewall_port
+	fi
+fi
+
+# Esegue il check del login
+if [ -z no_login_check]; then
+	if [ -n "$verbose" ]; then
+		echo "Esecuzione check del login"
+	fi
+	# esecuzione curl
+	output_curl=`curl -w "%{redirect_url}" --insecure https://www.gstatic.com/generate_204`
+	if [ -z "$output_curl" ]; then
+		echo "stato login: loggato"
+		exit 0
+	else
+		echo "stato login: non loggato"
+		exit 1
+	fi
+fi
