@@ -1,2 +1,23 @@
 #/bin/sh
+
+# funzione help
+function help {
+	echo "iisdalmine-login può essere richiamato con queste opzioni: "
+	echo "         -u --username username da usare per il login. Richiede un valore 
+	 -s --password password da usare per il login. Richiede un valore
+	 -i --firewall-ip indirizzo ip del firewall a cui connettersi. Richiede un valore
+	 -p --firewall-port porta del firewall a cui connettersi. Richiede un valore
+	 -v --verbose mosta un log dettagliato di iisdalmine-login
+	 -h --help mostra l'help
+	 -a --ask-password viene forzata la richiesta della password
+	 -d --domain dominio da utilizzare per il login. Richiede un valore. Se non specificato viene utilizzato marconi.locale
+	 -c --check esegue la verifica del login dopo essersi loggato
+	 --submit tipo submit da usare(???). Richiede un valore. Se non specificato viene utilizzato Login
+	 -r --redirect tipo redirect da usare(???). Richiede un valore
+	 -x --action azione da usare(???). Richiede un valore. Se non specificato viene utilizzato fw_logon
+	 -t --type sottotipo di zione da usare(???). Richiede un valore. Se non specificato viene utilizzato logon
+	 -l --lang lingua da usare per il login(???). Richiede un valore come en-US o it-IT. Se non specificato viene utilizzato en-us
+	 --firewall-logger-path percorso del file presente sul firewall che si occupa di login. Richiede un valore. Se non specificato viene utilizzao wgcgi.cgi"
+}
+
 curl --insecure --data fw_username=`cat ~/.iisdalmine/username.txt` --data fw_password=`cat ~/.iisdalmine/password.txt` --data fw_domain=marconi.locale --data submit=Login --data action=fw_logon --data fw_logon_type=logon --data redirect= --data lang=en-US https://`cat ~/.iisdalmine/firewall-ip.txt`:`cat ~/.iisdalmine/firewall-port.txt`/wgcgi.cgi
