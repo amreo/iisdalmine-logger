@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Flusso:
+#	Ping a $firewall_ip
+#	Prova download pagine login fw
+# 	Login
+#	Controllo login (controllo redirect)
