@@ -10,7 +10,7 @@ elif [ -x /usr/sbin/update-ca-trust ]; then
 	cp /tmp/iisdalmine.crt /etc/pki/ca-trust/source/anchors
 	update-ca-trust extract
 else
-	echo "Impossibile installare il certificato, metodo di gestione dei certificati sconosciuto e non implementato"
+	echo "Impossibile installare il certificato, metodo di gestione dei certificati sconosciuto e non implementato" 1>&2
 	exit 1
 fi
 

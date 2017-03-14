@@ -15,9 +15,122 @@ function help {
 	 --submit tipo submit da usare(???). Richiede un valore. Se non specificato viene utilizzato Login
 	 -r --redirect tipo redirect da usare(???). Richiede un valore
 	 -x --action azione da usare(???). Richiede un valore. Se non specificato viene utilizzato fw_logon
-	 -t --type sottotipo di zione da usare(???). Richiede un valore. Se non specificato viene utilizzato logon
+	 -t --type sottotipo di azione da usare(???). Richiede un valore. Se non specificato viene utilizzato logon
 	 -l --lang lingua da usare per il login(???). Richiede un valore come en-US o it-IT. Se non specificato viene utilizzato en-us
-	 --firewall-logger-path percorso del file presente sul firewall che si occupa di login. Richiede un valore. Se non specificato viene utilizzao wgcgi.cgi"
+	 --firewall-logger-path percorso del file presente sul firewall che si occupa di login. Richiede un valore. Se non specificato viene utilizzao wgcgi.cgi
+	 --show-password viene mostrata la password
+	 --post-data data da aggiungere per il login (POST)"
 }
+
+# verifica se getopt è quello vecchio o nuovo
+getopt --test > /dev/null
+if [[ $? -ne 4 ]]; then 
+    echo "La versione di getopt è vecchissima, ti consiglio di aggiornare tutto!.`getopt --test`" 1>&2
+    exit 1
+fi
+
+SHORT=u:s:i:p:d:r:x:t:l:vhac
+LONG=username:,password:,firewall-ip:,firewall-port:,domain:,redirect:,action:,type:,lang:,submit:,firewall-logger-path:,post-data:,verbose,help,ask-password,check,show-password
+
+username=`cat ~/.iisdalmine/username.txt`
+password=`cat ~/.iisdalmine/password.txt`
+firewall_ip=`cat ~/.iisdalmine/firewall-ip.txt`
+firewall_port=`cat ~/.iisdalmine/firewall-port.txt`
+domain="marconi.locale"
+redirect=""
+submit="Login"
+action="fw_logon"
+fw_logon_type="logon"
+lang="en-US"
+firewall_logger_path="wgcgi.cgi"
+
+# Esegue lo parsing dello opzioni
+PARSED=`getopt --options $SHORT --longoptions $LONG --name "$0" -- "$@"`
+
+# Controlla l'uscita di getopt per errori
+if [ $? -ne 0 ]; then
+	echo "Errore nel parsing delle opzioni: $?"	1>&2
+	exit 1
+fi
+eval set -- "$PARSED"
+
+# Imposta le variabili interessate fino a -- 
+while true; do
+    case "$1" in
+        -u|--username)
+            username="$2"
+            shift 2
+            ;;
+        -s|--password)
+            password="$2"
+            shift 2
+            ;;
+        -i|--firewall-ip)
+            firewall_ip="$2"
+            shift 2
+            ;;
+        -p|--firewall-port)
+			firewall_port="$2"     
+			shift 2
+            ;;
+		-v|--verbose)
+			verbose=yes
+            shift 1
+            ;;	 
+		-h|--help)
+			help
+			exit 0
+			;;
+		-a|--ask-password)
+			ask_password=true
+			shift 1
+			;;
+		-d|--domain)
+			domain="$2"
+			shift 2
+			;;
+		-c|--check)
+			check=true
+			shift 1
+			;;
+		--submit)
+			submit="$2"
+			shift 2
+			;;
+		-r|--redirect)
+			redirect="$2"
+			shift 2
+			;;
+		-x|--action)
+			action="$2"
+			shift 2
+			;;
+		-t|--type)
+			fw_logon_type="$2"
+			shift 2
+			;;
+		-l|--lang)
+			lang="$2"
+			shift 2
+			;;
+		--)
+            shift
+            break
+            ;;
+        *)
+            echo "Errore nelle opzioni"
+            exit 1
+            ;;
+    esac
+done
+
+if [ -n "$verbose" ]; then
+	echo "\$username=$username"
+	echo "\$password=$password"
+	echo "\$firewall_ip=$firewall_ip"
+	echo "\$firewall_port=$firewall_port"
+	echo "\$show_password=$show_password"
+	echo "\$check=$check"
+fi
 
 curl --insecure --data fw_username=`cat ~/.iisdalmine/username.txt` --data fw_password=`cat ~/.iisdalmine/password.txt` --data fw_domain=marconi.locale --data submit=Login --data action=fw_logon --data fw_logon_type=logon --data redirect= --data lang=en-US https://`cat ~/.iisdalmine/firewall-ip.txt`:`cat ~/.iisdalmine/firewall-port.txt`/wgcgi.cgi

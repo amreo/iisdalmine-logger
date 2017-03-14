@@ -17,7 +17,7 @@ function help {
 # verifica se getopt è quello vecchio o nuovo
 getopt --test > /dev/null
 if [[ $? -ne 4 ]]; then 
-    echo "La versione di getopt è vecchissima, ti consiglio di aggiornare tutto!.`getopt --test`"
+    echo "La versione di getopt è vecchissima, ti consiglio di aggiornare tutto!.`getopt --test`" 1>&2
     exit 1
 fi
 
@@ -38,7 +38,7 @@ PARSED=`getopt --options $SHORT --longoptions $LONG --name "$0" -- "$@"`
 
 # Controlla l'uscita di getopt per errori
 if [ $? -ne 0 ]; then
-	echo "Errore nel parsing delle opzioni: $?"	
+	echo "Errore nel parsing delle opzioni: $?"	1>&2
 	exit 1
 fi
 eval set -- "$PARSED"

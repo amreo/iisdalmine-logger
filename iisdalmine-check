@@ -25,7 +25,7 @@ function help {
 # verifica se getopt è quello vecchio o nuovo
 getopt --test > /dev/null
 if [[ $? -ne 4 ]]; then 
-    echo "La versione di getopt è vecchissima, ti consiglio di aggiornare tutto!.`getopt --test`"
+    echo "La versione di getopt è vecchissima, ti consiglio di aggiornare tutto!.`getopt --test`" 1>&2
     exit 1
 fi
 
@@ -43,7 +43,7 @@ PARSED=`getopt --options $SHORT --longoptions $LONG --name $0 -- $@`
 
 # Controlla l'uscita di getopt per errori
 if [ $? -ne 0 ]; then
-	echo "Errore nel parsing delle opzioni: $?"	
+	echo "Errore nel parsing delle opzioni: $?"	1>&2
 	exit 1
 fi
 eval set -- "$PARSED"
@@ -124,7 +124,7 @@ if [ -z no_ping ]; then
 		echo "esecuzione ping"
 	fi
 	if ! [ `ping -c $ping_count $firewall_ip` ] then
-		echo "ping fallito, sei collegato alla rete del iisdalmine?"
+		echo "ping fallito, sei collegato alla rete del iisdalmine?" 1>&2
 		exit 1  
 	fi
 fi
@@ -135,7 +135,7 @@ if [ -z no_download ]; then
 		echo "scaricamento pagina"
 	fi
 	# TODO: implementare download pagina
-	echo "Check non definito"
+	echo "Check non definito" 1>&2
 fi
 
 # Esegue il login se definito
