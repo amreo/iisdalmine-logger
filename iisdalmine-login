@@ -12,6 +12,7 @@ function help {
 	 -a --ask-password viene forzata la richiesta della password
 	 -d --domain dominio da utilizzare per il login. Richiede un valore. Se non specificato viene utilizzato marconi.locale
 	 -c --check esegue la verifica del login dopo essersi loggato
+	 --pre-check esegue la verifica di connettività prima del login 
 	 --submit tipo submit da usare(???). Richiede un valore. Se non specificato viene utilizzato Login
 	 -r --redirect tipo redirect da usare(???). Richiede un valore
 	 -x --action azione da usare(???). Richiede un valore. Se non specificato viene utilizzato fw_logon
@@ -19,7 +20,8 @@ function help {
 	 -l --lang lingua da usare per il login(???). Richiede un valore come en-US o it-IT. Se non specificato viene utilizzato en-us
 	 --firewall-logger-path percorso del file presente sul firewall che si occupa di login. Richiede un valore. Se non specificato viene utilizzao wgcgi.cgi
 	 --show-password viene mostrata la password
-	 --post-data data da aggiungere per il login (POST)"
+	 --post-data data da aggiungere per il login (POST)
+	 --secure impostazione per esegueire il login in modo sicuro"
 }
 
 # verifica se getopt è quello vecchio o nuovo
@@ -113,6 +115,18 @@ while true; do
 			lang="$2"
 			shift 2
 			;;
+		--post-data)
+			post_data=$post_data' --data '$2
+			shift 2
+			;;		
+		--pre-check)
+			pre_check=true
+			shift 1
+			;;
+		--secure)
+			secure=true
+			shift 1
+			;;
 		--)
             shift
             break
@@ -131,6 +145,75 @@ if [ -n "$verbose" ]; then
 	echo "\$firewall_port=$firewall_port"
 	echo "\$show_password=$show_password"
 	echo "\$check=$check"
+	echo "\$ask_password=$ask_password"
+	echo "\$domain=$domain"
+	echo "\$check=$check"
+	echo "\$submit=$submit"
+	echo "\$redirect=$redirect"
+	echo "\$action=$action"
+	echo "\$fw_logon_type=$fw_logon_type"
+	echo "\$lang=$lang"
+	echo "\$firewall_logger_path=$firewall_logger_path"
+	echo "\$show_password=$show_password"
+	echo "\$post_data=$post_data"
+	echo "\$pre_check=$pre_check"
 fi
 
-curl --insecure --data fw_username=`cat ~/.iisdalmine/username.txt` --data fw_password=`cat ~/.iisdalmine/password.txt` --data fw_domain=marconi.locale --data submit=Login --data action=fw_logon --data fw_logon_type=logon --data redirect= --data lang=en-US https://`cat ~/.iisdalmine/firewall-ip.txt`:`cat ~/.iisdalmine/firewall-port.txt`/wgcgi.cgi
+if [ -n "$pre_check" ]; then
+	if [ -n "$verbose" ]; then
+		echo "Esecuzione precheck"
+		if [ `iisdalmine-check --no-login-check --verbose` ]; then
+			echo "Check con successo"		
+		else		
+			echo "Precheck fallito" 1>&2
+			exit 1
+		fi
+	else
+		if ! [ `iisdalmine-check --no-login-check` ]; then
+			echo "Precheck fallito" 1>&2
+			exit 1
+		fi
+	fi
+fi
+
+if [ -n "$ask_password" ]; then
+	if [ -n "$show_password" ]; then
+		read -sp "password: " password
+		echo # Va a capo
+	else
+		read -p "password: " password
+	fi
+fi
+
+if [ -n "$secure" ]; then
+	post_data=$post_data' '
+else
+	post_data=$post_data' --insecure '
+fi
+
+data="$post_data --data fw_username=$username --data fw_password=$password --data fw_domain=$fw_domain --data submit=$submit --data action=$action --data fw_logon_type=$fw_logon_type --data redirect=$redirect_url --data lang=$lang https://$firewall_ip:$firewall_port/$firewall_logger_path"
+
+if [ -n "$verbose" ]; then
+	echo "/$data=$data"
+	curl $data
+else
+	curl $data > /dev/null
+fi
+
+if [ -n "$check" ]; then
+	if [ -n "$verbose" ]; then
+		echo "Esecuzione check"
+		if [ `iisdalmine-check --no-ping --no-download --verbose` ]; then
+			echo "Check con successo"		
+		else		
+			echo "Check fallito" 1>&2
+			exit 1
+		fi
+	else
+		if ! [ `iisdalmine-check --no-ping --no-download` ]; then
+			echo "Check fallito" 1>&2
+			exit 1
+		fi
+	fi
+fi
+
