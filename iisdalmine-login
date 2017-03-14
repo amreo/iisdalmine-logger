@@ -178,7 +178,9 @@ fi
 
 if [ -n "$ask_password" ]; then
 	if [ -n "$show_password" ]; then
+		stty -echo
 		read -sp "password: " password
+		stty echo
 		echo # Va a capo
 	else
 		read -p "password: " password
