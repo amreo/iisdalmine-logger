@@ -193,7 +193,7 @@ else
 	post_data=$post_data' --insecure '
 fi
 
-data="$post_data --data fw_username=$username --data fw_password=$password --data fw_domain=$fw_domain --data submit=$submit --data action=$action --data fw_logon_type=$fw_logon_type --data redirect=$redirect_url --data lang=$lang https://$firewall_ip:$firewall_port/$firewall_logger_path"
+data="$post_data -s --data fw_username=$username --data fw_password=$password --data fw_domain=$fw_domain --data submit=$submit --data action=$action --data fw_logon_type=$fw_logon_type --data redirect=$redirect_url --data lang=$lang https://$firewall_ip:$firewall_port/$firewall_logger_path"
 
 if [ -n "$verbose" ]; then
 	echo "/$data=$data"
