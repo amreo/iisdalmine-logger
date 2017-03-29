@@ -32,7 +32,7 @@ if [[ $? -ne 4 ]]; then
 fi
 
 SHORT=u:s:i:p:d:r:x:t:l:vhac
-LONG=username:,password:,firewall-ip:,firewall-port:,domain:,redirect:,action:,type:,lang:,submit:,firewall-logger-path:,post-data:,verbose,help,ask-password,check,show-password
+LONG=username:,password:,firewall-ip:,firewall-port:,domain:,redirect:,action:,type:,lang:,submit:,firewall-logger-path:,post-data:,verbose,help,ask-password,check,show-password,pre-check
 
 username=`cat ~/.iisdalmine/username.txt`
 password=`cat ~/.iisdalmine/password.txt`
@@ -203,14 +203,14 @@ fi
 if [ -n "$check" ]; then
 	if [ -n "$verbose" ]; then
 		echo "Esecuzione check"
-		if [ `iisdalmine-check --no-ping --no-download --verbose` ]; then
+		if [ `iisdalmine-check --no-ping --verbose` ]; then
 			echo "Check con successo"		
 		else		
 			echo "Check fallito" 1>&2
 			exit 1
 		fi
 	else
-		if ! [ `iisdalmine-check --no-ping --no-download` ]; then
+		if ! [ `iisdalmine-check --no-ping` ]; then
 			echo "Check fallito" 1>&2
 			exit 1
 		fi
